@@ -3,17 +3,19 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/05_mongodb/02_update-user-model/models"
-	"github.com/julienschmidt/httprouter"
-	"gopkg.in/mgo.v2"
+	"golang-web-dev/042_mongodb/05_mongodb/02_update-user-model/models"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserController struct {
-	session *mgo.Session
+	Client *mongo.Client
 }
 
-func NewUserController(s *mgo.Session) *UserController {
+func NewUserController(s *mongo.Client) *UserController {
 	return &UserController{s}
 }
 
@@ -22,7 +24,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 		Name:   "James Bond",
 		Gender: "male",
 		Age:    32,
-		Id:     p.ByName("id"),
+		Id:     primitive.NewObjectID(),
 	}
 
 	uj, err := json.Marshal(u)

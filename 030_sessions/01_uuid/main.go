@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 // For this code to run, you will need this package:
-// go get github.com/satori/go.uuid
+// go get github.com/google/uuid
 
 func main() {
 	http.HandleFunc("/", index)
@@ -18,12 +19,12 @@ func main() {
 func index(w http.ResponseWriter, req *http.Request) {
 	cookie, err := req.Cookie("session")
 	if err != nil {
-		id := uuid.NewV4()
+		id := uuid.New()
 		cookie = &http.Cookie{
 			Name:  "session",
 			Value: id.String(),
-			// Secure: true,
-			HttpOnly: true,
+			// Secure: true, // OVER HTTPS
+			HttpOnly: true, // CAN'T ACCESS WITH JAVASCRIPT
 			Path:     "/",
 		}
 		http.SetCookie(w, cookie)

@@ -1,13 +1,24 @@
 package main
 
 import (
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 )
 
-func main() {
+var tpl *template.Template
 
-	http.ListenAndServe(":8080", nil)
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
+}
+
+func main() {
+	http.HandleFunc("/", index)
+	http.HandleFunc("/about/", about)
+	http.HandleFunc("/contact/", contact)
+	http.HandleFunc("/apply", apply)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func index(w http.ResponseWriter, req *http.Request) {
@@ -26,12 +37,13 @@ func contact(w http.ResponseWriter, req *http.Request) {
 }
 
 func apply(w http.ResponseWriter, req *http.Request) {
-	err := tpl.ExecuteTemplate(w, "apply.gohtml", nil)
-	HandleError(w, err)
-}
-
-func applyProcess(w http.ResponseWriter, req *http.Request) {
-	err := tpl.ExecuteTemplate(w, "applyProcess.gohtml", nil)
+	fmt.Println(req.Method)
+	var err error
+	if req.Method == http.MethodPost {
+		err = tpl.ExecuteTemplate(w, "applyProcess.gohtml", nil)
+	} else {
+		err = tpl.ExecuteTemplate(w, "apply.gohtml", nil)
+	}
 	HandleError(w, err)
 }
 

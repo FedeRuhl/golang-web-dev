@@ -1,17 +1,18 @@
-package main
+package session
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
-func getUser(w http.ResponseWriter, req *http.Request) user {
+func GetUser(w http.ResponseWriter, req *http.Request) user {
 	// get cookie
 	c, err := req.Cookie("session")
 	if err != nil {
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		c = &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),
@@ -31,7 +32,7 @@ func getUser(w http.ResponseWriter, req *http.Request) user {
 	return u
 }
 
-func alreadyLoggedIn(w http.ResponseWriter, req *http.Request) bool {
+func AlreadyLoggedIn(w http.ResponseWriter, req *http.Request) bool {
 	c, err := req.Cookie("session")
 	if err != nil {
 		return false
@@ -48,7 +49,7 @@ func alreadyLoggedIn(w http.ResponseWriter, req *http.Request) bool {
 	return ok
 }
 
-func cleanSessions() {
+func CleanSessions() {
 	fmt.Println("BEFORE CLEAN") // for demonstration purposes
 	showSessions()              // for demonstration purposes
 	for k, v := range dbSessions {
@@ -62,7 +63,7 @@ func cleanSessions() {
 }
 
 // for demonstration purposes
-func showSessions() {
+func ShowSessions() {
 	fmt.Println("********")
 	for k, v := range dbSessions {
 		fmt.Println(k, v.un)

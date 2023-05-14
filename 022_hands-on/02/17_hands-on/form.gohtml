@@ -1,0 +1,18 @@
+<html>
+		<head>
+			<title>Testing with GO</title>
+		</head>
+		<body>
+			<h1>Form</h1>
+			<p>Method: {{.Method}}</p>
+			<p>URL: {{.Url}}</p>
+			<form action="" method="POST">
+				<label for="name">Name</label>
+				<input type="text" id="name" name="name">
+				<button type="submit">Send</button>
+			</form>
+			{{if .Body}}
+			<p>Hola {{.Body}}!</p>
+			{{end}}
+		</body>
+</html>

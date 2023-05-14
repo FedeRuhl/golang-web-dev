@@ -3,13 +3,14 @@ package main
 import (
 	"crypto/sha1"
 	"fmt"
-	"github.com/satori/go.uuid"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var tpl *template.Template
@@ -37,7 +38,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 		// create sha for file name
 		ext := strings.Split(fh.Filename, ".")[1]
 		h := sha1.New()
-		io.Copy(h, mf)
+		// io.Copy(h, mf)
 		fname := fmt.Sprintf("%x", h.Sum(nil)) + "." + ext
 		// create new file
 		wd, err := os.Getwd()
@@ -64,7 +65,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 func getCookie(w http.ResponseWriter, req *http.Request) *http.Cookie {
 	c, err := req.Cookie("session")
 	if err != nil {
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		c = &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

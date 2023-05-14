@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 type user struct {
@@ -66,7 +66,7 @@ func signup(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// create session
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		c := &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

@@ -1,29 +1,37 @@
 package main
 
 import (
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/05_mongodb/01_update-user-controller/controllers"
-	"github.com/julienschmidt/httprouter"
-	"gopkg.in/mgo.v2"
+	"context"
+	"golang-web-dev/042_mongodb/05_mongodb/01_update-user-controller/controllers"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
 	r := httprouter.New()
 	// Get a UserController instance
 	uc := controllers.NewUserController(getSession())
+	defer uc.Client.Disconnect(context.Background())
 	r.GET("/user/:id", uc.GetUser)
 	r.POST("/user", uc.CreateUser)
 	r.DELETE("/user/:id", uc.DeleteUser)
 	http.ListenAndServe("localhost:8080", r)
 }
 
-func getSession() *mgo.Session {
-	// Connect to our local mongo
-	s, err := mgo.Dial("mongodb://localhost")
+func getSession() *mongo.Client {
+	// Set client options
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
-	// Check if connection error, is mongo running?
+	// Connect to MongoDB
+	client, err := mongo.Connect(context.Background(), clientOptions)
+
+	// Check if connection error, is MongoDB running?
 	if err != nil {
 		panic(err)
 	}
-	return s
+
+	return client
 }

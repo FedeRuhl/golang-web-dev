@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/11_solution/models"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/11_solution/session"
-	"github.com/satori/go.uuid"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
+
+	"github.com/GoesToEleven/golang-web-dev/042_mongodb/11_solution/models"
+	"github.com/GoesToEleven/golang-web-dev/042_mongodb/11_solution/session"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (c Controller) SignUp(w http.ResponseWriter, req *http.Request) {
@@ -29,7 +30,7 @@ func (c Controller) SignUp(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		// create session
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		ck := &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),
@@ -76,7 +77,7 @@ func (c Controller) Login(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		// create session
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		ck := &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

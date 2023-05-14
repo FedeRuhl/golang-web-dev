@@ -3,14 +3,15 @@ package main
 import (
 	"crypto/sha1"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
-	"github.com/satori/go.uuid"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/google/uuid"
+	"github.com/julienschmidt/httprouter"
 )
 
 var tpl *template.Template
@@ -71,7 +72,7 @@ func indexSubmission(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 func getCookie(w http.ResponseWriter, r *http.Request) *http.Cookie {
 	c, err := r.Cookie("session")
 	if err != nil {
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		c = &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

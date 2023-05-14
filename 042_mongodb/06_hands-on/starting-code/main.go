@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/GoesToEleven/golang-web-dev/040_mongodb/06_hands-on/starting-code/controllers"
-	"github.com/julienschmidt/httprouter"
-	"gopkg.in/mgo.v2"
+	"golang-web-dev/042_mongodb/06_hands-on/starting-code/controllers"
+	"golang-web-dev/042_mongodb/06_hands-on/starting-code/models"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func main() {
@@ -17,13 +19,6 @@ func main() {
 	http.ListenAndServe("localhost:8080", r)
 }
 
-func getSession() *mgo.Session {
-	// Connect to our local mongo
-	s, err := mgo.Dial("mongodb://localhost")
-
-	// Check if connection error, is mongo running?
-	if err != nil {
-		panic(err)
-	}
-	return s
+func getSession() map[primitive.ObjectID]models.User {
+	return map[primitive.ObjectID]models.User{}
 }

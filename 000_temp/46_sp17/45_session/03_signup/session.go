@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/satori/go.uuid"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func getUser(w http.ResponseWriter, r *http.Request) user {

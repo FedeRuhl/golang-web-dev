@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/satori/go.uuid"
 	"html/template"
 	"net/http"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var tpl *template.Template
@@ -29,7 +30,7 @@ func index(w http.ResponseWriter, req *http.Request) {
 func getCookie(w http.ResponseWriter, req *http.Request) *http.Cookie {
 	c, err := req.Cookie("session")
 	if err != nil {
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		c = &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

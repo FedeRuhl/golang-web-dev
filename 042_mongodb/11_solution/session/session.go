@@ -2,10 +2,11 @@ package session
 
 import (
 	"fmt"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/11_solution/models"
-	"github.com/satori/go.uuid"
 	"net/http"
 	"time"
+
+	"github.com/GoesToEleven/golang-web-dev/042_mongodb/11_solution/models"
+	"github.com/google/uuid"
 )
 
 const Length int = 30
@@ -18,7 +19,7 @@ func GetUser(w http.ResponseWriter, req *http.Request) models.User {
 	// get cookie
 	ck, err := req.Cookie("session")
 	if err != nil {
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		ck = &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

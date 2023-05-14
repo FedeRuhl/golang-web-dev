@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"html/template"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"gopkg.in/mgo.v2"
 )
 
 type customer struct {

@@ -3,17 +3,25 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"io"
+	"log"
 	"net/http"
+	"os"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 var db *sql.DB
 var err error
 
 func main() {
-	db, err = sql.Open("mysql", "awsuser:mypassword@tcp(mydbinstance.cakwl95bxza0.us-west-1.rds.amazonaws.com:3306)/test02?charset=utf8")
-	check(err)
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	db, err = sql.Open("mysql", os.Getenv("CONNECTION"))
 	defer db.Close()
 
 	err = db.Ping()
@@ -28,7 +36,7 @@ func main() {
 	http.HandleFunc("/delete", del)
 	http.HandleFunc("/drop", drop)
 	http.Handle("/favicon.ico", http.NotFoundHandler())
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
 	check(err)
 }
 

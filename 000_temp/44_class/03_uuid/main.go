@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/satori/go.uuid"
 	"io"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -15,7 +16,7 @@ func main() {
 func foo(w http.ResponseWriter, req *http.Request) {
 	c, err := req.Cookie("session")
 	if err != nil {
-		sID, _ := uuid.NewV4()
+		sID := uuid.New()
 		c = &http.Cookie{
 			Name:  "session",
 			Value: sID.String(),

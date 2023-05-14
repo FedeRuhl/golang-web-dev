@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func main() {

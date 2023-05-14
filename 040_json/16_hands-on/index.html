@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>JSON exercise</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link rel="stylesheet" href=""> -->
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <script>
+            const arr = [
+                {
+                    Code: 200,
+                    Descrip: 'StatusOK'
+                },
+                {
+                    Code: 301,
+                    Descrip: 'StatusMovedPermanently'
+                },
+                {
+                    Code: 302,
+                    Descrip: 'StatusFound'
+                },
+                {
+                    Code: 303,
+                    Descrip: 'StatusSeeOther'
+                },
+                {
+                    Code: 307,
+                    Descrip: 'StatusTemporaryRedirect'
+                },
+                {
+                    Code: 400,
+                    Descrip: 'StatusBadRequest'
+                },
+                {
+                    Code: 401,
+                    Descrip: 'StatusUnauthorized'
+                },
+                {
+                    Code: 402,
+                    Descrip: 'StatusPaymentRequired'
+                },
+                {
+                    Code: 403,
+                    Descrip: 'StatusForbidden'
+                },
+                {
+                    Code: 404,
+                    Descrip: 'StatusNotFound'
+                },
+                {
+                    Code: 405,
+                    Descrip: 'StatusMethodNotAllowed'
+                },
+                {
+                    Code: 418,
+                    Descrip: 'StatusTeapot'
+                },
+                {
+                    Code: 500,
+                    Descrip: 'StatusInternalServerError'
+                }
+            ];
+
+            document.write(JSON.stringify(arr));
+        </script>
+        <!-- <script src="" async defer></script> -->
+    </body>
+</html>

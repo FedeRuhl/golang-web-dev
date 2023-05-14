@@ -13,3 +13,7 @@
   6 | McLeod |    26 |  72000
   7 | James  |    32 |  35000
 ```
+
+# CREATE TABLE employees (id SERIAL PRIMARY KEY, name TEXT, score INT DEFAULT 10, salary REAL);
+# INSERT INTO employees (name, score, salary) VALUES ('Daniel', 23, 55000), ('Arin', 25, 65000), ('Juan', 24, 72000), ('Shen', 26, 64000), ('Myke', 27, 58000), ('McLeod', 26, 72000), ('James', 32, 35000);
+# SELECT * FROM employees;

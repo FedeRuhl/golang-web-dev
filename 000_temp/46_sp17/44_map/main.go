@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
 	"html/template"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 type user struct {

@@ -1,11 +1,14 @@
 package books
 
 import (
+	"context"
 	"errors"
-	"github.com/GoesToEleven/golang-web-dev/046_mongodb/16_go-mongo/config"
-	"gopkg.in/mgo.v2/bson"
+	"golang-web-dev/046_mongodb/16_go-mongo/config"
+	"log"
 	"net/http"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Book struct {
@@ -14,28 +17,38 @@ type Book struct {
 	Isbn   string  // `json:"isbn" bson:"isbn"`
 	Title  string  // `json:"title" bson:"title"`
 	Author string  // `json:"author" bson:"author"`
-	Price  float32 // `json:"price" bson:"price"`
+	Price  float64 // `json:"price" bson:"price,truncate"`
 }
 
 func AllBooks() ([]Book, error) {
-	bks := []Book{}
-	err := config.Books.Find(bson.M{}).All(&bks)
+	q, err := config.Books.Find(context.Background(), bson.M{})
 	if err != nil {
 		return nil, err
 	}
+	bks := []Book{}
+	err = q.All(context.Background(), &bks)
+
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
 	return bks, nil
 }
 
 func OneBook(r *http.Request) (Book, error) {
-	bk := Book{}
 	isbn := r.FormValue("isbn")
+	bk := Book{}
 	if isbn == "" {
-		return bk, errors.New("400. Bad Request.")
+		return bk, errors.New("400. Bad Request")
 	}
-	err := config.Books.Find(bson.M{"isbn": isbn}).One(&bk)
+	q := config.Books.FindOne(context.Background(), bson.M{"isbn": isbn})
+	err := q.Decode(&bk)
+
 	if err != nil {
 		return bk, err
 	}
+
 	return bk, nil
 }
 
@@ -49,18 +62,18 @@ func PutBook(r *http.Request) (Book, error) {
 
 	// validate form values
 	if bk.Isbn == "" || bk.Title == "" || bk.Author == "" || p == "" {
-		return bk, errors.New("400. Bad request. All fields must be complete.")
+		return bk, errors.New("400. Bad request. All fields must be complete")
 	}
 
 	// convert form values
 	f64, err := strconv.ParseFloat(p, 32)
 	if err != nil {
-		return bk, errors.New("406. Not Acceptable. Price must be a number.")
+		return bk, errors.New("406. Not Acceptable. Price must be a number")
 	}
-	bk.Price = float32(f64)
+	bk.Price = f64
 
 	// insert values
-	err = config.Books.Insert(bk)
+	_, err = config.Books.InsertOne(context.Background(), bk)
 	if err != nil {
 		return bk, errors.New("500. Internal Server Error." + err.Error())
 	}
@@ -76,19 +89,21 @@ func UpdateBook(r *http.Request) (Book, error) {
 	p := r.FormValue("price")
 
 	if bk.Isbn == "" || bk.Title == "" || bk.Author == "" || p == "" {
-		return bk, errors.New("400. Bad Request. Fields can't be empty.")
+		return bk, errors.New("400. Bad Request. Fields can't be empty")
 	}
 
 	// convert form values
 	f64, err := strconv.ParseFloat(p, 32)
 	if err != nil {
-		return bk, errors.New("406. Not Acceptable. Enter number for price.")
+		log.Fatal(err)
+		return bk, errors.New("406. Not Acceptable. Enter number for price")
 	}
-	bk.Price = float32(f64)
+	bk.Price = f64
 
 	// update values
-	err = config.Books.Update(bson.M{"isbn": bk.Isbn}, &bk)
+	_, err = config.Books.UpdateOne(context.Background(), bson.M{"isbn": bk.Isbn}, bson.M{"$set": bk})
 	if err != nil {
+		log.Fatal(err)
 		return bk, err
 	}
 	return bk, nil
@@ -97,10 +112,10 @@ func UpdateBook(r *http.Request) (Book, error) {
 func DeleteBook(r *http.Request) error {
 	isbn := r.FormValue("isbn")
 	if isbn == "" {
-		return errors.New("400. Bad Request.")
+		return errors.New("400. Bad Request")
 	}
 
-	err := config.Books.Remove(bson.M{"isbn": isbn})
+	_, err := config.Books.DeleteOne(context.Background(), bson.M{"isbn": isbn})
 	if err != nil {
 		return errors.New("500. Internal Server Error")
 	}

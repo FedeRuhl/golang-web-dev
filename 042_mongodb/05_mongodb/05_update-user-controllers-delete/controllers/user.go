@@ -1,36 +1,51 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/05_mongodb/05_update-user-controllers-delete/models"
-	"github.com/julienschmidt/httprouter"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"golang-web-dev/042_mongodb/05_mongodb/05_update-user-controllers-delete/models"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserController struct {
-	session *mgo.Session
+	Client *mongo.Client
 }
 
-func NewUserController(s *mgo.Session) *UserController {
+func NewUserController(s *mongo.Client) *UserController {
 	return &UserController{s}
 }
 
 func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// Grab id
 	id := p.ByName("id")
 
-	if !bson.IsObjectIdHex(id) {
+	// Verify id is ObjectId hex representation, otherwise return status not found
+	if !primitive.IsValidObjectID(id) {
 		w.WriteHeader(http.StatusNotFound) // 404
 		return
 	}
 
-	oid := bson.ObjectIdHex(id)
+	// ObjectIdHex returns an ObjectId from the provided hex representation.
+	oid, err := primitive.ObjectIDFromHex(id)
 
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// composite literal
 	u := models.User{}
 
-	if err := uc.session.DB("go-web-dev-db").C("users").FindId(oid).One(&u); err != nil {
+	// Fetch user
+	collection := uc.Client.Database("go-web-dev-db").Collection("users")
+	err = collection.FindOne(context.Background(), bson.M{"_id": oid}).Decode(&u)
+
+	if err != nil {
 		w.WriteHeader(404)
 		return
 	}
@@ -46,13 +61,22 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 }
 
 func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// var u models.User
 	u := models.User{}
-
 	json.NewDecoder(r.Body).Decode(&u)
 
-	u.Id = bson.NewObjectId()
+	// create bson ID
+	u.Id = primitive.NewObjectID()
 
-	uc.session.DB("go-web-dev-db").C("users").Insert(u)
+	// store the user in mongodb
+	collection := uc.Client.Database("go-web-dev-db").Collection("users")
+	result, err := collection.InsertOne(context.Background(), u)
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(result.InsertedID)
+	}
 
 	uj, err := json.Marshal(u)
 	if err != nil {
@@ -67,15 +91,22 @@ func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ ht
 func (uc UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	id := p.ByName("id")
 
-	if !bson.IsObjectIdHex(id) {
-		w.WriteHeader(404)
+	// Verify id is ObjectId hex representation, otherwise return status not found
+	if !primitive.IsValidObjectID(id) {
+		w.WriteHeader(http.StatusNotFound) // 404
 		return
 	}
 
-	oid := bson.ObjectIdHex(id)
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// Delete user
-	if err := uc.session.DB("go-web-dev-db").C("users").RemoveId(oid); err != nil {
+	collection := uc.Client.Database("go-web-dev-db").Collection("users")
+	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": oid})
+
+	if err != nil {
 		w.WriteHeader(404)
 		return
 	}

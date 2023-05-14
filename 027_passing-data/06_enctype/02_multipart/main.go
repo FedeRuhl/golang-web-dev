@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -28,7 +29,7 @@ func foo(w http.ResponseWriter, req *http.Request) {
 
 	// body
 	bs := make([]byte, req.ContentLength)
-	req.Body.Read(bs)
+	fmt.Println(req.Body.Read(bs))
 	body := string(bs)
 
 	err := tpl.ExecuteTemplate(w, "index.gohtml", body)

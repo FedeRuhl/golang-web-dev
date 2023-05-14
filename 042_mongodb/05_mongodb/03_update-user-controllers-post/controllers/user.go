@@ -1,20 +1,22 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/GoesToEleven/golang-web-dev/042_mongodb/05_mongodb/03_update-user-controllers-post/models"
-	"github.com/julienschmidt/httprouter"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"golang-web-dev/042_mongodb/05_mongodb/03_update-user-controllers-post/models"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserController struct {
-	session *mgo.Session
+	Client *mongo.Client
 }
 
-func NewUserController(s *mgo.Session) *UserController {
+func NewUserController(s *mongo.Client) *UserController {
 	return &UserController{s}
 }
 
@@ -23,7 +25,7 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 		Name:   "James Bond",
 		Gender: "male",
 		Age:    32,
-		Id:     p.ByName("id"),
+		Id:     primitive.NewObjectID(),
 	}
 
 	uj, err := json.Marshal(u)
@@ -36,16 +38,19 @@ func (uc UserController) GetUser(w http.ResponseWriter, r *http.Request, p httpr
 	fmt.Fprintf(w, "%s\n", uj)
 }
 
-func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	u := models.User{}
-
+func (uc UserController) CreateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// u := models.User{}
+	var u models.User
+	// r.ParseForm()
 	json.NewDecoder(r.Body).Decode(&u)
 
 	// create bson ID
-	u.Id = bson.NewObjectId()
+	// u.Id = bson.NewObjectId()
+	u.Id = primitive.NewObjectID()
 
 	// store the user in mongodb
-	uc.session.DB("go-web-dev-db").C("users").Insert(u)
+	collection := uc.Client.Database("go-web-dev-db").Collection("users")
+	collection.InsertOne(context.Background(), u)
 
 	uj, err := json.Marshal(u)
 	if err != nil {
